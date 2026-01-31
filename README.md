@@ -1,4 +1,4 @@
-# Roche Analytical Data Science Programmer Coding Assessment
+# Genentech Analytical Data Science Programmer Coding Assessment
 
 **Author:** Chunyi Wang  
 **Date:** January 2025
@@ -76,5 +76,6 @@ Result: 44 unique subjects
 ## How to Run
 
 **R (Q1-Q3):** Set working directory to question folder, then `source()` the R script.
+
 
 **Python (Q4):** Open `genai_assistant.ipynb` in Jupyter/Colab, add your OpenAI API key, run all cells.
