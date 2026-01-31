@@ -1,0 +1,72 @@
+> source("~/Full time/Genetech - ADS programmer/question_3_tlg/02_create_visualizations.R", echo=TRUE)
+
+> # ==============================================================================
+> # Program: 02_create_visualizations.R
+> # Purpose: Create AE visu .... [TRUNCATED] 
+
+> library(dplyr)
+
+> library(pharmaverseadam)
+
+> # Read source data
+> adsl <- pharmaverseadam::adsl
+
+> adae <- pharmaverseadam::adae
+
+> # Filter TEAEs
+> adae_teae <- adae %>%
++   filter(TRTEMFL == "Y")
+
+> # ==============================================================================
+> # Plot 1: AE Severity Distribution by Treatment
+> # ============= .... [TRUNCATED] 
+
+> # Save Plot 1
+> ggsave("plot1_severity.png", p1, width = 8, height = 6, dpi = 300)
+
+> # ==============================================================================
+> # Plot 2: Top 10 Most Frequent AEs with 95% CI
+> # ============== .... [TRUNCATED] 
+
+> # Calculate subject counts per AETERM
+> ae_counts <- adae_teae %>%
++   group_by(AETERM) %>%
++   summarise(n = n_distinct(USUBJID), .groups = "drop") .... [TRUNCATED] 
+
+> # Calculate percentage and 95% Clopper-Pearson CI
+> ae_counts <- ae_counts %>%
++   rowwise() %>%
++   mutate(
++     pct = n / n_total * 100,
++     ci .... [TRUNCATED] 
+
+> # Reorder AETERM by frequency for plotting
+> ae_counts <- ae_counts %>%
++   mutate(AETERM = reorder(AETERM, pct))
+
+> # Create forest plot
+> p2 <- ggplot(ae_counts, aes(x = pct, y = AETERM)) +
++   geom_point(size = 3) +
++   geom_errorbarh(aes(xmin = ci_low, xmax = c .... [TRUNCATED] 
+
+> # Save Plot 2
+> ggsave("plot2_top10_ae.png", p2, width = 8, height = 6, dpi = 300)
+
+> # Print summary for verification
+> cat("\n=== Visualization Summary ===\n")
+
+=== Visualization Summary ===
+
+> cat("TEAEs included:", nrow(adae_teae), "\n")
+TEAEs included: 1122 
+
+> cat("Unique subjects with TEAEs:", n_total, "\n")
+Unique subjects with TEAEs: 217 
+
+> cat("\nPlot 1 saved: plot1_severity.png\n")
+
+Plot 1 saved: plot1_severity.png
+
+> cat("Plot 2 saved: plot2_top10_ae.png\n")
+Plot 2 saved: plot2_top10_ae.png
+> 

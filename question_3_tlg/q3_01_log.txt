@@ -1,0 +1,51 @@
+# ==============================================================================
+# Program: 01_create_ae_summary_table.R
+# Purpose: Create summary table of treatment-emergent adverse events (TEAEs)
+# Input:   pharmaverseadam::adae, pharmaverseadam::adsl
+# Output:  ae_summary_table.html
+# Author:  Chunyi Wang
+# Date:    2025-01-30
+# 
+# Note: Set working directory to question_3_tlg/ before running this script
+# ==============================================================================
+
+# Set language to English for warnings/messages
+Sys.setenv(LANGUAGE = "en")
+
+# Load required packages -------------------------------------------------------
+library(dplyr)
+library(gtsummary)
+library(pharmaverseadam)
+
+# Read source data -------------------------------------------------------------
+adsl <- pharmaverseadam::adsl
+adae <- pharmaverseadam::adae
+
+# Filter TEAEs -----------------------------------------------------------------
+adae_teae <- adae %>%
+  filter(TRTEMFL == "Y")
+
+# Create summary table ---------------------------------------------------------
+tbl <- adae_teae %>%
+  tbl_hierarchical(
+    variables = c(AESOC, AETERM),
+    by = ACTARM,
+    id = USUBJID,
+    denominator = adsl,
+    overall_row = TRUE,
+    label = "..ard_hierarchical_overall.." ~ "Treatment Emergent AEs"
+  ) %>%
+  add_overall(last = TRUE) %>%
+  bold_labels()
+
+# Save output ------------------------------------------------------------------
+tbl %>%
+  as_gt() %>%
+  gt::gtsave("ae_summary_table.html")
+
+# Print summary for verification -----------------------------------------------
+cat("\n=== AE Summary Table ===\n")
+cat("TEAEs included:", nrow(adae_teae), "\n")
+cat("Unique subjects with TEAEs:", n_distinct(adae_teae$USUBJID), "\n")
+cat("Treatment groups:", paste(unique(adae_teae$ACTARM), collapse = ", "), "\n")
+cat("Output saved: ae_summary_table.html\n")

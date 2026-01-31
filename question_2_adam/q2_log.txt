@@ -1,0 +1,118 @@
+> source("~/Full time/Genetech - ADS programmer/question_2_adam/create_adsl.R", echo=TRUE)
+
+> # ==============================================================================
+> # Program: create_adsl.R
+> # Purpose: Create ADaM ADSL (Subject L .... [TRUNCATED] 
+
+> library(pharmaversesdtm)
+
+> library(dplyr)
+
+> library(lubridate)
+
+> library(stringr)
+
+> # Read source data -------------------------------------------------------------
+> dm <- pharmaversesdtm::dm
+
+> vs <- pharmaversesdtm::vs
+
+> ex <- pharmaversesdtm::ex
+
+> ds <- pharmaversesdtm::ds
+
+> ae <- pharmaversesdtm::ae
+
+> # Create ADSL base dataset -----------------------------------------------------
+> adsl <- dm %>%
++   select(-DOMAIN)
+
+> # Derive TRTSDTM and TRTSTMF ---------------------------------------------------
+> # Process EX data to derive datetime variables
+> ex_ext <- ex %>% .... [TRUNCATED] 
+
+> # Merge first exposure datetime to ADSL
+> adsl <- adsl %>%
++   derive_vars_merged(
++     dataset_add = ex_ext,
++     filter_add = (EXDOSE > 0 | (EXD .... [TRUNCATED] 
+
+> # Merge last exposure datetime to ADSL
+> adsl <- adsl %>%
++   derive_vars_merged(
++     dataset_add = ex_ext,
++     filter_add = (EXDOSE > 0 | (EXDO .... [TRUNCATED] 
+
+> # Convert datetime to date
+> adsl <- adsl %>%
++   derive_vars_dtm_to_dt(source_vars = exprs(TRTSDTM, TRTEDTM))
+
+> # Derive AGEGR9 and AGEGR9N ----------------------------------------------------
+> adsl <- adsl %>%
++   mutate(
++     AGEGR9 = case_when(
++       AG .... [TRUNCATED] 
+
+> # Derive ITTFL -----------------------------------------------------------------
+> adsl <- adsl %>%
++   mutate(
++     ITTFL = ifelse(!is.na(ARM), "Y ..." ... [TRUNCATED] 
+
+> # Derive LSTAVLDT --------------------------------------------------------------
+> adsl <- adsl %>%
++   derive_vars_extreme_event(
++     by_vars = e .... [TRUNCATED] 
+
+> # Select and order final variables ---------------------------------------------
+> adsl_final <- adsl %>%
++   select(
++     STUDYID, USUBJID, SUBJID .... [TRUNCATED] 
+
+> # Save output ------------------------------------------------------------------
+> saveRDS(adsl_final, "adsl.rds")
+
+> write.csv(adsl_final, "adsl.csv", row.names = FALSE, na = "")
+
+> # Print summary for verification -----------------------------------------------
+> cat("\n=== ADSL Summary ===\n")
+
+=== ADSL Summary ===
+
+> cat("Dimensions:", nrow(adsl_final), "obs x", ncol(adsl_final), "vars\n")
+Dimensions: 306 obs x 23 vars
+
+> cat("Variables:", paste(names(adsl_final), collapse = ", "), "\n")
+Variables: STUDYID, USUBJID, SUBJID, SITEID, AGE, AGEU, AGEGR9, AGEGR9N, SEX, RACE, ETHNIC, ARM, ARMCD, ACTARM, ACTARMCD, COUNTRY, TRTSDTM, TRTSTMF, TRTSDT, TRTEDTM, TRTEDT, ITTFL, LSTAVLDT 
+
+> cat("\nAGEGR9 distribution:\n")
+
+AGEGR9 distribution:
+
+> print(table(adsl_final$AGEGR9, useNA = "ifany"))
+
+    >50 18 - 50 
+    305       1 
+
+> cat("\nITTFL distribution:\n")
+
+ITTFL distribution:
+
+> print(table(adsl_final$ITTFL, useNA = "ifany"))
+
+  Y 
+306 
+
+> cat("\nMissing values:\n")
+
+Missing values:
+
+> print(colSums(is.na(adsl_final)))
+ STUDYID  USUBJID   SUBJID   SITEID      AGE     AGEU   AGEGR9  AGEGR9N      SEX     RACE   ETHNIC      ARM    ARMCD 
+       0        0        0        0        0        0        0        0        0        0        0        0        0 
+  ACTARM ACTARMCD  COUNTRY  TRTSDTM  TRTSTMF   TRTSDT  TRTEDTM   TRTEDT    ITTFL LSTAVLDT 
+       0        0        0       52       52       52       54       54        0        0 
+Warning message:
+Check duplicates: the dataset which consists of all records selected for any of the events defined by `events` contains
+duplicate records with respect to `STUDYID`, `USUBJID`, `LSTAVLDT`, and `event_nr`
+ℹ Run admiral::get_duplicates_dataset() to access the duplicate records 
+> 
