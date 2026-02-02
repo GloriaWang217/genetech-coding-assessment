@@ -79,3 +79,7 @@ Result: 44 unique subjects
 
 
 **Python (Q4):** Open `genai_assistant.ipynb` in Jupyter/Colab, add your OpenAI API key, run all cells.
+
+## Video Explanation
+
+Here is a brief screen-share walkthrough of my repository. https://www.loom.com/share/cbbf66753e794592adb3c276cd70668d
